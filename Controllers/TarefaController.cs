@@ -42,7 +42,7 @@ namespace ProjetoLista.Controllers
             var idPessoa = HttpContext.Session.GetString("email");
             if (idPessoa == null) return Unauthorized("não autorizado");
 
-            var sessao = Request.Cookies["idusado"];
+            var sessao = Request.Cookies["Idusado"];
 
             if (sessao != null)
             {

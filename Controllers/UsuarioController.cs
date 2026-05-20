@@ -15,7 +15,7 @@ namespace ProjetoLista.Controllers
         {
             _context = context;
         }
-        [HttpGet] 
+        [HttpGet]
         public IActionResult BuscarUsuarios()
         {
             return Ok(_context.Usuarios.ToList());
@@ -31,14 +31,15 @@ namespace ProjetoLista.Controllers
             return Ok(usuarioBanco);
         }
         [HttpPost("login")]
-        public IActionResult Login(Usuario dadosLogin)
+        public IActionResult Login([FromBody] Usuario dadosLogin)
         {
-            var loginU = _context.Usuarios.Where(u => u.Email.Equals(dadosLogin.Email) && u.Senha.Equals(dadosLogin.Senha)).ToList();
+            var loginU = _context.Usuarios.Where(u => u.Email.Equals
+            (dadosLogin.Email) && u.Senha.Equals(dadosLogin.Senha)).ToList();
 
 
             if (loginU.Count == 0)
-
                 return Unauthorized("Email ou Senha Incorretas");
+            Console.WriteLine(loginU[0].Id.ToString());
             HttpContext.Session.SetString("email", dadosLogin.Email);
             Response.Cookies.Append("Idusado", loginU[0].Id.ToString(),
 
@@ -46,10 +47,9 @@ namespace ProjetoLista.Controllers
             {
                 Expires = DateTime.Now.AddMinutes(30),
                 Secure = true,
-                HttpOnly = true
+                HttpOnly = true,
+                SameSite = SameSiteMode.None
             });
-
-
             return Ok("Login realizado com sucesso!");
         }
 
