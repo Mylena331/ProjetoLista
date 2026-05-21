@@ -40,7 +40,7 @@ namespace ProjetoLista.Controllers
             if (loginU.Count == 0)
                 return Unauthorized("Email ou Senha Incorretas");
             Console.WriteLine(loginU[0].Id.ToString());
-            HttpContext.Session.SetString("email", dadosLogin.Email);
+            HttpContext.Session.SetString("Idusado", loginU[0].Id.ToString());
             Response.Cookies.Append("Idusado", loginU[0].Id.ToString(),
 
             new CookieOptions

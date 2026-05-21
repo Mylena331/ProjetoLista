@@ -14,32 +14,35 @@ namespace ProjetoLista.Controllers
         {
             _context = context;
         }
-        [HttpGet]
-        public IActionResult BuscarTarefas()
+        [HttpGet("atividade")]
+        public IActionResult TarefasUsuario()
         {
-            var idPessoa = HttpContext.Session.GetString("email");
-            if (idPessoa == null) return Unauthorized("não autorizado");
-
-            return Ok(_context.Tarefas.ToList());
-        }
-        [HttpGet("{id}")]
-        public IActionResult BuscarTarefa(int id)
-        {
-            var idPessoa = HttpContext.Session.GetString("email");
-            if (idPessoa == null) return Unauthorized("não autorizado"); 
-
-            var tarefaBanco = _context.Tarefas.Find(id);
-            if (tarefaBanco == null)
+            var sessaoUsuario = HttpContext.Session.GetString("Idusado");
+            if (sessaoUsuario == null)
             {
-                return NotFound("Tarefa não encontrada");
+                return Unauthorized("Faça login Antes");
             }
-            return Ok(tarefaBanco);
+            var resultado = from c in _context.Usuarios
+                            join r in _context.Tarefas
+                            on c.Id equals r.UsuarioId
+                            where c.Id == int.Parse(sessaoUsuario)
+                            select new
+                            {
+                                Usuario = c.Nome,
+                                c.Email,
+                                Tarefa = r.Id,
+                                r.Descricao, r.Status
+                                    
+                                };
+                                return Ok(resultado.ToList());
+                     
         }
+
         [HttpPost("Cadastrar")]
         public IActionResult CriarTarefas(Tarefa tarefa)
         {
 
-            var idPessoa = HttpContext.Session.GetString("email");
+            var idPessoa = HttpContext.Session.GetString("Idusado");
             if (idPessoa == null) return Unauthorized("não autorizado");
 
             var sessao = Request.Cookies["Idusado"];
@@ -53,10 +56,10 @@ namespace ProjetoLista.Controllers
             return Created("Teste", tarefa);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("atualizar/{id}")]
         public IActionResult AtualizarTarefa(int id, Tarefa tarefa)
         {
-            var idPessoa = HttpContext.Session.GetString("email");
+            var idPessoa = HttpContext.Session.GetString("Idusado");
             if (idPessoa == null) return Unauthorized("não autorizado");
 
             var tarefaBanco = _context.Tarefas.Find(id);
@@ -66,14 +69,14 @@ namespace ProjetoLista.Controllers
             }
             tarefaBanco.Descricao = tarefa.Descricao;
             tarefaBanco.Status = tarefa.Status;
-            tarefaBanco.UsuarioId = tarefa.UsuarioId;
+           
             _context.SaveChanges();
             return Ok("Tarefa atualizada");
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("Deletar/{id}")]
         public IActionResult DeletarTarefa(int id)
         {
-            var idPessoa = HttpContext.Session.GetString("email");
+            var idPessoa = HttpContext.Session.GetString("Idusado");
             if (idPessoa == null) return Unauthorized("não autorizado");
 
             var tarefaBanco = _context.Tarefas.Find(id);
